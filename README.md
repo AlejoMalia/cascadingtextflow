@@ -24,7 +24,7 @@ Give it any text and it returns a map of how that text is built: which words and
 
 1. **Letters → words.** The text is split into words (the language is detected automatically). Function words — articles, prepositions… — are set aside.
 2. **Words → counts.** Every word is counted, and the layers it appears in are recorded.
-3. **Counts → nodes.** A chain of letters that recurs — a word, or a chain of two or three words such as `gran maestro` — becomes a **node**. A word that lives almost only inside a longer recurring chain is part of that chain, not a node of its own.
+3. **Counts → nodes.** A chain of letters that recurs — a word, or a chain of two or three words such as `machine learning` — becomes a **node**. A word that lives almost only inside a longer recurring chain is part of that chain, not a node of its own.
 4. **Each node has its solar system.** The words that stand around its mentions (its *orbit*) describe it without anyone explaining it; rarer words weigh more.
 5. **Everything is traced across layers.** A layer is a real page (if the text carries page breaks) or a block of 250 words. Every node and word has its trace: its mentions in each layer.
 
@@ -61,29 +61,29 @@ All output below is real, produced from the sample texts in `examples/`. Timings
 
 ### Terminal summary
 
-`npm run read -- examples/tecnico.txt` (a Spanish technical text about a cache; links trimmed to five):
+`npm run read -- examples/technical.txt` (a technical text about a cache; links trimmed to five):
 
 ```text
-es · 111 words · 1 layers (fixed-size) · 3ms
+en · 111 words · 1 layers (fixed-size) · 2ms
 
 NODES (chains that recur) and their solar systems
-  cache                    ×7    layers 1-1  orbit: motor, consulta, límite, superarlo, guarda, cálculo
+  cache                    ×7    layers 1-1  orbit: engine, query, memory, limit, computation, rate
                            █
-  motor                    ×6    layers 1-1  orbit: amplía, cache, reduce, sube, tasa, existe
+  engine                   ×6    layers 1-1  orbit: cache, stores, receives, expands, intermediate, results
                            █
-  consulta                 ×3    layers 1-1  orbit: cache, motor, repetida, deja, recibe, guarda
+  query                    ×3    layers 1-1  orbit: cache, engine, repeated, avoids, leaves, receives
                            █
-  clave                    ×3    layers 1-1  orbit: existe, responde, motor, cache, nueva, antiguas
+  key                      ×3    layers 1-1  orbit: exists, oldest, responds, exist, cache, new
                            █
-  límite                   ×3    layers 1-1  orbit: memoria, cache, motor, tasa, ajustar, reduce
+  limit                    ×3    layers 1-1  orbit: memory, cache, rate, engine, exceeding, reduces
                            █
 
 LINKS
-  consulta ↔ clave  strength 1  together in 2 blocks
-  cache ↔ motor  strength 0.99  together in 2 blocks
-  cache ↔ consulta  strength 0.984  together in 2 blocks
-  cache ↔ clave  strength 0.984  together in 2 blocks
-  motor ↔ consulta  strength 0.949  together in 2 blocks
+  query ↔ key  strength 1  together in 2 blocks
+  cache ↔ engine  strength 0.99  together in 2 blocks
+  cache ↔ query  strength 0.984  together in 2 blocks
+  cache ↔ key  strength 0.984  together in 2 blocks
+  engine ↔ query  strength 0.949  together in 2 blocks
 ```
 
 A text this short fits in one layer, so each trace is a single bar and link strengths rest on very few blocks.
@@ -106,21 +106,21 @@ LINKS
 
 ### JSON result
 
-Entries from `--json` for `examples/tecnico.txt`, one of each kind:
+Entries from `--json` for `examples/technical.txt`, one of each kind:
 
 ```json
 {
   "node": {
     "chain": "cache", "length": 1, "mentions": 7, "layers": 1, "first": 1, "last": 1,
     "core": [1, 1], "weight": 4.852, "trace": [7],
-    "orbit": ["motor", "consulta", "límite", "superarlo", "guarda", "cálculo", "memoria", "intermedios"]
+    "orbit": ["engine", "query", "memory", "limit", "computation", "rate", "exceeding", "key"]
   },
-  "link": { "a": "cache", "b": "motor", "strength": 0.99, "sharedBlocks": 2, "sharedLayers": 1 },
+  "link": { "a": "cache", "b": "engine", "strength": 0.99, "sharedBlocks": 2, "sharedLayers": 1 },
   "wordIndex.cache": {
     "n": 7, "function": false, "layers": 1, "first": 1, "last": 1, "density": [7],
-    "before": [["el", 5], ["de", 1], ["del", 1]],
-    "after": [["almacena", 1], ["responde", 1], ["lo", 1], ["tiene", 1], ["elimina", 1]],
-    "orbit": ["motor", "almacena", "responde", "elimina", "consulta", "límite", "memoria", "resultados"]
+    "before": [["the", 7]],
+    "after": [["engine", 1], ["responds", 1], ["saves", 1], ["has", 1], ["evicts", 1]],
+    "orbit": ["engine", "responds", "saves", "evicts", "query", "memory", "limit", "stores"]
   }
 }
 ```
@@ -179,13 +179,13 @@ const map = {
 };
 ```
 
-For `examples/tecnico.txt` it gives:
+For `examples/technical.txt` it gives:
 
 ```json
-{"nodes":[{"chain":"cache","mentions":7,"core":[1,1],"orbit":["motor","consulta","límite","superarlo"]},{"chain":"motor","mentions":6,"core":[1,1],"orbit":["amplía","cache","reduce","sube"]},{"chain":"consulta","mentions":3,"core":[1,1],"orbit":["cache","motor","repetida","deja"]},{"chain":"clave","mentions":3,"core":[1,1],"orbit":["existe","responde","motor","cache"]},{"chain":"límite","mentions":3,"core":[1,1],"orbit":["memoria","cache","motor","tasa"]}],"links":[["consulta","clave",1],["cache","motor",0.99],["cache","consulta",0.984]]}
+{"nodes":[{"chain":"cache","mentions":7,"core":[1,1],"orbit":["engine","query","memory","limit"]},{"chain":"engine","mentions":6,"core":[1,1],"orbit":["cache","stores","receives","expands"]},{"chain":"query","mentions":3,"core":[1,1],"orbit":["cache","engine","repeated","avoids"]},{"chain":"key","mentions":3,"core":[1,1],"orbit":["exists","oldest","responds","exist"]},{"chain":"limit","mentions":3,"core":[1,1],"orbit":["memory","cache","rate","engine"]}],"links":[["query","key",1],["cache","engine",0.99],["cache","query",0.984]]}
 ```
 
-That is 544 characters against 625 of the original, so on a short text there is little to gain. The map's size is capped by the `slice` calls, so the saving grows with the length of the text.
+That is 535 characters against 613 of the original, so on a short text there is little to gain. The map's size is capped by the `slice` calls, so the saving grows with the length of the text.
 
 ### 2. Check an LLM's summary against the source
 
